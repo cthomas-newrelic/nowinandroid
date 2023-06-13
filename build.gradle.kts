@@ -15,9 +15,15 @@
  */
 
 buildscript {
+    val nrAgentVersion = project.properties["nrAgentVersion"] ?: "7.+"
+    val nrAgentSnapShotId = project.properties["nrAgentSnapshotId"] as String?
+
     repositories {
         google()
         mavenCentral()
+
+        maven { url = uri("https://oss.sonatype.org/content/repositories/comnewrelic-${nrAgentSnapShotId}")}
+        mavenLocal()
 
         // Android Build Server
         maven { url = uri("../nowinandroid-prebuilts/m2repository") }
@@ -26,6 +32,7 @@ buildscript {
         classpath(libs.google.oss.licenses.plugin) {
             exclude(group = "com.google.protobuf")
         }
+        classpath("com.newrelic.agent.android:agent-gradle-plugin:${nrAgentVersion}")
     }
 }
 

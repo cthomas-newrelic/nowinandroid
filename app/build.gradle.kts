@@ -24,6 +24,9 @@ plugins {
     id("jacoco")
     id("nowinandroid.android.application.firebase")
     id("com.google.android.gms.oss-licenses-plugin")
+
+    // withNewrelic
+    id("newrelic")
 }
 
 android {
@@ -33,7 +36,8 @@ android {
         versionName = "0.0.5" // X.Y.Z; X = Major, Y = minor, Z = Patch level
 
         // Custom test runner to set up Hilt dependency graph
-        testInstrumentationRunner = "com.google.samples.apps.nowinandroid.core.testing.NiaTestRunner"
+        testInstrumentationRunner =
+            "com.google.samples.apps.nowinandroid.core.testing.NiaTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -42,11 +46,16 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = NiaBuildType.DEBUG.applicationIdSuffix
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
         val release by getting {
             isMinifyEnabled = true
             applicationIdSuffix = NiaBuildType.RELEASE.applicationIdSuffix
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
 
             // To publish on the Play store a private signing key is required, but to allow anyone
             // who clones the code to sign and run the release variant, use the debug signing key.
@@ -120,6 +129,10 @@ dependencies {
     implementation(libs.androidx.window.manager)
     implementation(libs.androidx.profileinstaller)
     implementation(libs.coil.kt)
+
+    // withNewRelic
+    val nrAgentVersion = project.properties["nrAgentVersion"] ?: "7.+"
+    implementation("com.newrelic.agent.android:android-agent:${nrAgentVersion}")
 }
 
 // androidx.test is forcing JUnit, 4.12. This forces it to use 4.13
@@ -130,3 +143,23 @@ configurations.configureEach {
         force("org.objenesis:objenesis:2.6")
     }
 }
+
+// region withNewRelic
+if (project.plugins.hasPlugin("newrelic")) {
+    newrelic {
+        variantConfigurations {
+            create("debug") {
+                instrument = false
+                uploadMappingFile = false
+            }
+            create("qa") {
+                uploadMappingFile = true
+            }
+        }
+
+        // variantMapsEnabled = true
+        uploadMapsForVariant("release", "qa")
+        excludeVariantInstrumentation("integDebug", "stageDebug", "hotfixDebug", "prodDebug")
+    }
+}
+// endregion

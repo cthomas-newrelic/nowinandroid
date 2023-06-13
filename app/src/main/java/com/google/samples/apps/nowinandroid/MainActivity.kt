@@ -46,6 +46,8 @@ import com.google.samples.apps.nowinandroid.core.designsystem.theme.NiaTheme
 import com.google.samples.apps.nowinandroid.core.model.data.DarkThemeConfig
 import com.google.samples.apps.nowinandroid.core.model.data.ThemeBrand
 import com.google.samples.apps.nowinandroid.ui.NiaApp
+import com.newrelic.agent.android.NewRelic
+import com.newrelic.agent.android.logging.AgentLog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
@@ -76,6 +78,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        // wthNewRelic
+        NewRelic.withApplicationToken("<app-token>")
+            .withLogLevel(AgentLog.DEBUG)
+            .start(this.applicationContext)
 
         var uiState: MainActivityUiState by mutableStateOf(Loading)
 

@@ -34,3 +34,23 @@
 -dontwarn org.openjsse.javax.net.ssl.SSLParameters
 -dontwarn org.openjsse.javax.net.ssl.SSLSocket
 -dontwarn org.openjsse.net.ssl.OpenJSSE
+
+
+##
+## NewRelic Gradle plugin 7.x requires the following additions:
+##
+-keep class com.newrelic.agent.android.** { *; }
+-dontwarn com.newrelic.agent.android.**
+-keepattributes Exceptions, Signature, InnerClasses, LineNumberTable, SourceFile, EnclosingMethod
+
+# For using GSON @Expose annotation
+# -keepattributes *Annotation*
+
+# Retain generic signatures of TypeToken and its subclasses with R8 version 3.0 and higher.
+# -keep class com.google.gson.reflect.TypeToken
+# -keep class * extends com.google.gson.reflect.TypeToken
+# -keep public class * implements java.lang.reflect.Type
+
+-keepattributes Signature
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class *
